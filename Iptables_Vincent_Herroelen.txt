@@ -16,8 +16,8 @@ sudo iptables -t filter -A INPUT -p icmp -j DROP
 sudo iptables -t filter -A OUTPUT -p icmp --icmp-type echo reply -j ACCEPT
 
 Allow security updates:
-sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 sudo iptables -A OUTPUT -d security.debian.org --dport 80 -j ACCEPT
+sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 Extra(ssh):
 sudo iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
