@@ -1,4 +1,4 @@
-Apache, ProFTPD, bind9:
+Apache, ProFTPD, Bind9:
 sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
 sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
 sudo iptables -A OUTPUT -p tcp --dport 80 -j ACCEPT	
