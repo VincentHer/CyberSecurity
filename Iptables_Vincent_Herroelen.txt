@@ -1,14 +1,19 @@
-Apache, ProFTPD, Bind9:
-sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
-sudo iptables -A OUTPUT -p tcp --dport 80 -j ACCEPT	
-sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
-sudo iptables -A OUTPUT -p tcp --dport 443 -j ACCEPT
+Loopback:
+sudo iptables -A INPUT -i lo -j ACCEPT   
+sudo iptables -A OUTPUT -o lo -j ACCEPT 
 
-sudo iptables -A INPUT -p tcp -m multiport --dports 20,21 -j ACCEPT
-sudo iptables -A OUTPUT -p tcp -m multiport --dports 20,21 -j ACCEPT
+Apache, ProFTPD, bind9:
+Sudo iptables -A INPUT -p tcp -m multiport --dport 80,443 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+sudo iptables -A INPUT -p tcp -m multiport --sport 80,433 -m conntrack -ctstate ESTABLISHED -j ACCEPT
+
+sudo iptables -A INPUT -p tcp -m multiport --dports 20,21 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+sudo iptables -A OUTPUT -p tcp -m multiport --sports 20,21 -m conntrack -ctstate ESTABLISHED -j ACCEPT
 
 sudo iptables -A INPUT -p udp --dport 53 -j ACCEPT
-sudo iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+sudo iptables -A OUTPUT -p udp --sport 53 -j ACCEPT
+
+sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+sudo iptables -A OUTPUT -m state --state ESTABLISHED, RELATED -j ACCEPT
 
 Protect the server against ping flooding:
 sudo iptables -t filter -A INPUT -p icmp --icmp-type echo-request -m limit --limit 5/minute -j ACCEPT
@@ -17,7 +22,12 @@ sudo iptables -t filter -A OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT
 
 Allow security updates:
 sudo iptables -A OUTPUT -p tcp -d security.debian.org --dport 80 -j ACCEPT
-sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+
+Extra(ssh):
+sudo iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+sudo iptables -A OUTPUT -p tcp --sport 22 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+
 
 Default Policy:
 sudo iptables -P INPUT DROP
@@ -25,3 +35,5 @@ sudo iptables -P OUTPUT DROP
 
 Save IpTables:
 sudo iptables-save
+
+
